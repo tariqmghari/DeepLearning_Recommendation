@@ -5,10 +5,13 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from sklearn.metrics.pairwise import cosine_similarity
 
-def extract_imgsFeatures(model, data_loader):
+def extract_imgsFeatures(model, data_loader,GPU=False):
     images_features = []
 
     for image, label in data_loader:
+        if(GPU):
+            image=image.to('cuda')
+            label = label.to('cuda')
         feature = model.extract_features(image)
         images_features.append(feature[0].tolist())
     
