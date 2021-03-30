@@ -8,13 +8,16 @@ def imshow(img):
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
-def modelTrain(model, trainLoader, optimizer, lossFnc, epoch=5):
+def modelTrain(model, trainLoader, optimizer, lossFnc, epoch=5,GPU=False):
     l = len(trainLoader) 
     print('--- Training started ---')
     for epoch in range(epoch):
         running_loss = 0.0
         for i, data in enumerate(trainLoader, 0):
             inputs, labels = data
+            if(GPU):
+                inputs = inputs.to('cuda')
+                labels = labels.to('cuda')
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = lossFnc(outputs, labels)
@@ -27,7 +30,7 @@ def modelTrain(model, trainLoader, optimizer, lossFnc, epoch=5):
                 print('epoch: %d loss: %.4f' %(epoch + 1, running_loss / l))
     print('--- Finished Training ---')
 
-def modelAccurcy(model, testLoader, classes=None):
+def modelAccurcy(model, testLoader, classes=None,GPU=False):
     correct = 0
     total = 0
     if classes is not None:
@@ -37,6 +40,9 @@ def modelAccurcy(model, testLoader, classes=None):
     with torch.no_grad():
         for data in testLoader:
             images, labels = data
+            if(GPU):
+                images = images.to('cuda')
+                labels = labels.to('cuda')
             outputs = model(images)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
